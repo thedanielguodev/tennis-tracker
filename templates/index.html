@@ -5,29 +5,19 @@
     <title>Tennis Progress Tracker</title>
 </head>
 <body>
+
     <h1>Tennis Progress Tracker</h1>
-    
+
     <h2>Stats</h2>
-    <p>Weekly practice minutes: {{ weekly_total }}</p>
-    <p>Match win rate: {{ win_rate }}%</p>
-    
+    <p>
+        Weekly practice minutes:
+        <strong><span id="weeklyMinutes">{{ weekly_total }}</span></strong>
+    </p>
+
     <h2>Log Practice</h2>
-    <form action="/log_practice" method="POST">
-        Date: <input type="date" name="date" required><br>
-        Duration (minutes): <input type="number" name="duration" required><br>
-        <button type="submit">Log Practice</button>
-    </form>
-    
-    <h2>Log Match</h2>
-    <form action="/log_match" method="POST">
-        Date: <input type="date" name="date" required><br>
-        Opponent level (1-10): <input type="number" name="opponent_level" required><br>
-        Result: 
-        <select name="result">
-            <option value="win">Win</option>
-            <option value="loss">Loss</option>
-        </select><br>
-        <button type="submit">Log Match</button>
-    </form>
+    <input id="minutesInput" type="number" placeholder="Minutes practiced">
+    <button id="logButton">Log Practice</button>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
