@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from calculations import add_practice, add_match, get_effectiveness
-
+#fixed
 app = Flask(__name__)
 
 @app.route("/")
