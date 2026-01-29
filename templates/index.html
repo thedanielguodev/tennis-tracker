@@ -1,23 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Tennis Progress Tracker</title>
+    <title>Tennis Tracker</title>
 </head>
 <body>
 
-    <h1>Tennis Progress Tracker</h1>
+<h1>Tennis Effectiveness</h1>
+<h2>Score: <span id="score">{{ score }}</span></h2>
 
-    <h2>Stats</h2>
-    <p>
-        Weekly practice minutes:
-        <strong><span id="weeklyMinutes">{{ weekly_total }}</span></strong>
-    </p>
+<h3>Practice</h3>
+<input id="minutes" type="number" placeholder="Minutes">
+<input id="intensity" type="number" min="1" max="5" placeholder="Intensity (1–5)">
+<button id="practiceBtn">Log Practice</button>
 
-    <h2>Log Practice</h2>
-    <input id="minutesInput" type="number" placeholder="Minutes practiced">
-    <button id="logButton">Log Practice</button>
+<h3>Match</h3>
+<input id="opponent" type="number" min="1" max="10" placeholder="Opponent level">
+<select id="result">
+    <option value="win">Win</option>
+    <option value="loss">Loss</option>
+</select>
+<button id="matchBtn">Log Match</button>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
