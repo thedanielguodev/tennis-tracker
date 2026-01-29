@@ -1,31 +1,33 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const score = document.getElementById("score");
+    const scoreEl = document.getElementById("score");
 
-    document.getElementById("practiceBtn").onclick = async () => {
-        const minutes = document.getElementById("minutes").value;
-        const intensity = document.getElementById("intensity").value;
-
-        const res = await fetch("/practice", {
+    document.getElementById("practiceBtn").addEventListener("click", () => {
+        fetch("/practice", {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({ minutes, intensity })
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                minutes: document.getElementById("minutes").value,
+                intensity: document.getElementById("intensity").value
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            scoreEl.textContent = data.score;
         });
+    });
 
-        const data = await res.json();
-        score.textContent = data.score;
-    };
-
-    document.getElementById("matchBtn").onclick = async () => {
-        const opponent = document.getElementById("opponent").value;
-        const result = document.getElementById("result").value;
-
-        const res = await fetch("/match", {
+    document.getElementById("matchBtn").addEventListener("click", () => {
+        fetch("/match", {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({ opponent, result })
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                opponent: document.getElementById("opponent").value,
+                result: document.getElementById("result").value
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            scoreEl.textContent = data.score;
         });
-
-        const data = await res.json();
-        score.textContent = data.score;
-    };
+    });
 });
