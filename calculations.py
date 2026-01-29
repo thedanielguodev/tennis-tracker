@@ -5,12 +5,12 @@ def add_practice(minutes, intensity):
     global practice_score
     practice_score += minutes * intensity
 
-def add_match(opponent_level, result):
+def add_match(opponent, result):
     global match_score
     if result == "win":
-        match_score += opponent_level * 1.5
+        match_score += opponent * 1.5
     else:
-        match_score += opponent_level * 0.7
+        match_score += opponent * 0.7
 
-def get_effectiveness():
+def get_score():
     return round(practice_score + match_score, 1)
