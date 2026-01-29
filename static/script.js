@@ -1,35 +1,31 @@
 document.addEventListener("DOMContentLoaded", () => {
     const score = document.getElementById("score");
 
-    document.getElementById("logPractice").onclick = async () => {
-        const minutes = parseInt(document.getElementById("practiceMinutes").value);
-        const intensity = parseInt(document.getElementById("practiceIntensity").value);
+    document.getElementById("practiceBtn").onclick = async () => {
+        const minutes = document.getElementById("minutes").value;
+        const intensity = document.getElementById("intensity").value;
 
-        if (!minutes || !intensity) return;
-
-        const res = await fetch("/log_practice", {
+        const res = await fetch("/practice", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({ minutes, intensity })
         });
 
         const data = await res.json();
-        score.textContent = data.effectiveness;
+        score.textContent = data.score;
     };
 
-    document.getElementById("logMatch").onclick = async () => {
-        const opponent = parseInt(document.getElementById("opponentLevel").value);
-        const result = document.getElementById("matchResult").value;
+    document.getElementById("matchBtn").onclick = async () => {
+        const opponent = document.getElementById("opponent").value;
+        const result = document.getElementById("result").value;
 
-        if (!opponent) return;
-
-        const res = await fetch("/log_match", {
+        const res = await fetch("/match", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({ opponent, result })
         });
 
         const data = await res.json();
-        score.textContent = data.effectiveness;
+        score.textContent = data.score;
     };
 });
