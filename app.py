@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from calculations import add_practice_minutes, get_weekly_minutes
+from calculations import add_practice, add_match, get_effectiveness
 
 app = Flask(__name__)
 
@@ -7,17 +7,26 @@ app = Flask(__name__)
 def index():
     return render_template(
         "index.html",
-        weekly_total=get_weekly_minutes()
+        effectiveness=get_effectiveness()
     )
 
 @app.route("/log_practice", methods=["POST"])
 def log_practice():
     data = request.get_json()
-    minutes = int(data["duration"])
-    add_practice_minutes(minutes)
-    return jsonify({
-        "weekly_total": get_weekly_minutes()
-    })
+    add_practice(
+        int(data["minutes"]),
+        int(data["intensity"])
+    )
+    return jsonify({"effectiveness": get_effectiveness()})
+
+@app.route("/log_match", methods=["POST"])
+def log_match():
+    data = request.get_json()
+    add_match(
+        int(data["opponent"]),
+        data["result"]
+    )
+    return jsonify({"effectiveness": get_effectiveness()})
 
 if __name__ == "__main__":
     app.run(debug=True)
