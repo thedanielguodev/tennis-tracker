@@ -1,25 +1,40 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Tennis Tracker</title>
+    <meta charset="UTF-8">
+    <title>Tennis Skill Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-<h1>Tennis Effectiveness</h1>
-<h2>Score: <span id="score">{{ score }}</span></h2>
+<div class="hero">
+    <h1>Train smarter.<br>Win more matches.</h1>
+    <p>Track practice quality, match difficulty, and see a real effectiveness score.</p>
 
-<h3>Practice</h3>
-<input id="minutes" type="number" placeholder="Minutes">
-<input id="intensity" type="number" min="1" max="5" placeholder="Intensity (1–5)">
-<button id="practiceBtn">Log Practice</button>
+    <div class="score-box">
+        <span class="label">Current Effectiveness</span>
+        <span class="score" id="score">{{ score }}</span>
+    </div>
+</div>
 
-<h3>Match</h3>
-<input id="opponent" type="number" min="1" max="10" placeholder="Opponent level">
-<select id="result">
-    <option value="win">Win</option>
-    <option value="loss">Loss</option>
-</select>
-<button id="matchBtn">Log Match</button>
+<div class="actions">
+    <div class="card">
+        <h2>Practice</h2>
+        <input id="minutes" type="number" placeholder="Minutes practiced">
+        <input id="intensity" type="number" min="1" max="5" placeholder="Intensity (1–5)">
+        <button id="practiceBtn">Log Practice</button>
+    </div>
+
+    <div class="card">
+        <h2>Match</h2>
+        <input id="opponent" type="number" min="1" max="10" placeholder="Opponent level">
+        <select id="result">
+            <option value="win">Win</option>
+            <option value="loss">Loss</option>
+        </select>
+        <button id="matchBtn">Log Match</button>
+    </div>
+</div>
 
 <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
