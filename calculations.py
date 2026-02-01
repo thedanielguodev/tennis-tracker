@@ -13,5 +13,5 @@ def add_match(opponent_level, result):
         if score < 0:
             score = 0
 
-def get_effectiveness():
+def get_score():
     return round(score, 1)
