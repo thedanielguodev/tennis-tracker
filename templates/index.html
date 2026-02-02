@@ -13,7 +13,22 @@
 
     <div class="score-box">
         <span class="label">Current Effectiveness</span>
-        <span class="score" id="score">{{ score }}</span>
+        <span class="score" id="score">{{ effectiveness }}</span>
+    </div>
+
+    <div class="utr-box">
+        <span class="label">Your UTR</span>
+        <span class="utr" id="utr">{{ utr if utr is not none else "Not set" }}</span>
+    </div>
+
+    <div class="predicted-box">
+        <span class="label">Predicted UTR</span>
+        <span class="predicted" id="predicted">{{ predicted if predicted is not none else "—" }}</span>
+    </div>
+
+    <div class="utr-input">
+        <input id="player_utr" type="number" min="0" max="16.5" step="0.01" placeholder="Enter your UTR">
+        <button id="setUtrBtn">Set UTR</button>
     </div>
 </div>
 
@@ -27,7 +42,7 @@
 
     <div class="card">
         <h2>Match</h2>
-        <input id="opponent" type="number" min="1" max="10" placeholder="Opponent level">
+        <input id="opponent" type="number" min="0" max="16.5" placeholder="Opponent UTR">
         <select id="result">
             <option value="win">Win</option>
             <option value="loss">Loss</option>
