@@ -19,64 +19,48 @@ body {
     font-size: 3rem;
     font-weight: 800;
     line-height: 1.1;
+    margin-bottom: 15px;
 }
 
 .hero p {
     font-size: 1.2rem;
     color: #94a3b8;
-    max-width: 700px;
-    margin: 10px auto 30px;
+    max-width: 600px;
+    margin: 0 auto 20px;
 }
 
-/* BOXES */
-.score-box, .utr-box, .predicted-box {
+.score-box {
     display: inline-flex;
     flex-direction: column;
     align-items: center;
     background: rgba(15, 23, 42, 0.6);
     border: 1px solid #1e293b;
     border-radius: 18px;
-    padding: 20px 30px;
+    padding: 24px 40px;
     backdrop-filter: blur(10px);
-    margin: 10px;
+    margin-bottom: 20px;
 }
 
-.score-box .score, .utr-box .utr, .predicted-box .predicted {
-    font-size: 2.5rem;
+.score-box .label {
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+.score-box .score {
+    font-size: 3rem;
     font-weight: 700;
-    color: #38bdf8;
     margin-top: 5px;
+    color: #38bdf8;
 }
 
-.effectiveness-info {
-    max-width: 600px;
-    margin: 20px auto;
-    color: #cbd5e1;
-}
-
-#resetBtn {
-    margin-top: 20px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    background: linear-gradient(135deg, #f87171, #ef4444);
-    color: #020617;
-}
-
-#resetBtn:hover {
-    opacity: 0.9;
-}
-
-/* ACTION CARDS */
+/* ACTIONS */
 .actions {
     max-width: 900px;
     margin: auto;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 24px;
-    padding: 0 20px 50px;
+    padding: 0 20px 40px;
 }
 
 .card {
@@ -86,10 +70,15 @@ body {
     padding: 28px;
 }
 
+.card h2 {
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+
 input, select {
     width: 100%;
     margin-top: 12px;
-    padding: 12px;
+    padding: 12px 14px;
     background: #020617;
     border: 1px solid #1e293b;
     border-radius: 12px;
@@ -99,13 +88,14 @@ input, select {
 
 button {
     width: 100%;
-    margin-top: 12px;
+    margin-top: 18px;
     padding: 12px;
     border-radius: 14px;
     border: none;
     background: linear-gradient(135deg, #38bdf8, #0ea5e9);
     color: #020617;
     font-weight: 600;
+    font-size: 1rem;
     cursor: pointer;
 }
 
@@ -115,17 +105,18 @@ button:hover {
 
 /* CHARTS */
 .charts {
-    max-width: 1000px;
-    margin: 0 auto 50px;
+    max-width: 900px;
+    margin: auto;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 24px;
-    padding: 0 20px;
+    padding: 0 20px 60px;
 }
 
-.chart-card {
-    background: rgba(2, 6, 23, 0.9);
-    border: 1px solid #1e293b;
-    border-radius: 20px;
-    padding: 20px;
+.explanation {
+    max-width: 900px;
+    margin: auto;
+    font-size: 1rem;
+    padding-bottom: 40px;
+    color: #94a3b8;
 }
