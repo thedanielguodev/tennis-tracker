@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from calculations import set_player_utr, log_practice, log_match, get_state
+from calculations import set_player_utr, log_practice, log_match, get_state, reset_all
 
 app = Flask(__name__)
 
@@ -20,4 +20,9 @@ def practice():
 @app.route("/match", methods=["POST"])
 def match():
     log_match(request.json["opponent"], request.json["result"])
+    return jsonify(get_state())
+
+@app.route("/reset", methods=["POST"])
+def reset():
+    reset_all()
     return jsonify(get_state())
