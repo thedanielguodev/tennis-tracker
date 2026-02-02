@@ -10,39 +10,25 @@
 
 <div class="hero">
     <h1>Train smarter.<br>Win more matches.</h1>
-    <p>Track practice quality, match difficulty, and see your real effectiveness score.</p>
+    <p>Track practice quality, match difficulty, and see a real effectiveness score.</p>
 
     <div class="score-box">
         <span class="label">Current Effectiveness</span>
         <span class="score" id="score">{{ effectiveness }}</span>
-    </div>
-    <div class="utr-box">
-        <span class="label">Your UTR</span>
-        <span class="utr" id="utr">{{ utr }}</span>
-    </div>
-    <div class="predicted-box">
-        <span class="label">Predicted UTR</span>
-        <span class="predicted" id="predicted">{{ predicted }}</span>
-    </div>
-
-    <div class="effectiveness-info">
-        <h3>What is Effectiveness?</h3>
-        <p>Effectiveness measures how sharp you are right now. 
-           <strong>Cold</strong> = low focus, <strong>Average</strong> = okay, 
-           <strong>Sharp</strong> = good, <strong>On Fire</strong> = excellent, 
-           <strong>Peak Form</strong> = outstanding!</p>
+        <span class="label" id="effectivenessLabel">{{ label }}</span>
+        <p>UTR: <span id="utrDisplay">{{ utr }}</span></p>
+        <p>Predicted UTR: <span id="predicted">{{ predicted }}</span></p>
     </div>
 
     <button id="resetBtn">Reset All</button>
 </div>
 
 <div class="actions">
+
     <div class="card">
         <h2>Set Your UTR</h2>
-        <div class="utr-input">
-            <input type="number" min="0" max="16.5" id="setUTR" placeholder="Enter your UTR">
-            <button id="setUTRBtn">Set</button>
-        </div>
+        <input id="utrInput" type="number" step="0.1" min="0" max="16.5" placeholder="Your current UTR">
+        <button id="setUtrBtn">Set UTR</button>
     </div>
 
     <div class="card">
@@ -54,26 +40,32 @@
 
     <div class="card">
         <h2>Match</h2>
-        <input id="opponent" type="number" min="0" max="16.5" placeholder="Opponent UTR">
+        <input id="opponent" type="number" min="0" max="16.5" step="0.1" placeholder="Opponent UTR">
         <select id="result">
             <option value="win">Win</option>
             <option value="loss">Loss</option>
         </select>
-        <input type="date" id="matchDate">
         <button id="matchBtn">Log Match</button>
     </div>
 </div>
 
 <div class="charts">
-    <div class="chart-card">
-        <h3>Wins & Losses Over Time</h3>
-        <canvas id="winLossChart"></canvas>
-    </div>
-    <div class="chart-card">
-        <h3>Effectiveness Over Time</h3>
+    <div class="card">
+        <h2>Effectiveness Over Time</h2>
         <canvas id="effectivenessChart"></canvas>
     </div>
+
+    <div class="card">
+        <h2>Wins & Losses</h2>
+        <canvas id="matchChart"></canvas>
+    </div>
 </div>
+
+<p class="explanation">
+    <strong>What is Effectiveness?</strong> <br>
+    Effectiveness measures how sharp you are today. <br>
+    Cold &lt;30, Average 30–49, Sharp 50–69, On Fire 70–84, Peak Form 85–100.
+</p>
 
 <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
