@@ -1,7 +1,7 @@
 player_utr = None
 effectiveness = 50
 practice_log = []
-
+#fixed version
 def clamp(v, a, b):
     return max(a, min(v, b))
 
