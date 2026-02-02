@@ -1,33 +1,40 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const scoreEl = document.getElementById("score");
+function updateUI(state) {
+    document.getElementById("score").textContent = state.effectiveness;
+    document.getElementById("utr").textContent = state.utr ?? "Not set";
+    document.getElementById("predicted").textContent = state.predicted ?? "—";
+}
 
-    document.getElementById("practiceBtn").addEventListener("click", () => {
-        fetch("/practice", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                minutes: document.getElementById("minutes").value,
-                intensity: document.getElementById("intensity").value
-            })
-        })
-        .then(res => res.json())
-        .then(data => {
-            scoreEl.textContent = data.score;
-        });
-    });
+document.getElementById("setUtrBtn").addEventListener("click", () => {
+    const utr = parseFloat(document.getElementById("player_utr").value);
+    fetch("/set_utr", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({utr})
+    })
+    .then(res => res.json())
+    .then(updateUI);
+});
 
-    document.getElementById("matchBtn").addEventListener("click", () => {
-        fetch("/match", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                opponent: document.getElementById("opponent").value,
-                result: document.getElementById("result").value
-            })
-        })
-        .then(res => res.json())
-        .then(data => {
-            scoreEl.textContent = data.score;
-        });
-    });
+document.getElementById("practiceBtn").addEventListener("click", () => {
+    const minutes = parseFloat(document.getElementById("minutes").value);
+    const intensity = parseFloat(document.getElementById("intensity").value);
+    fetch("/practice", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({minutes, intensity})
+    })
+    .then(res => res.json())
+    .then(updateUI);
+});
+
+document.getElementById("matchBtn").addEventListener("click", () => {
+    const opponent = parseFloat(document.getElementById("opponent").value);
+    const result = document.getElementById("result").value;
+    fetch("/match", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({opponent, result})
+    })
+    .then(res => res.json())
+    .then(updateUI);
 });
