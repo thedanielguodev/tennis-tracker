@@ -1,23 +1,23 @@
 from flask import Flask, render_template, request, jsonify
-from calculations import add_practice, add_match, get_score
+from calculations import set_player_utr, log_practice, log_match, get_state
 
 app = Flask(__name__)
 
 @app.route("/")
-def home():
-    return render_template("index.html", score=get_score())
+def index():
+    return render_template("index.html", **get_state())
+
+@app.route("/set_utr", methods=["POST"])
+def set_utr():
+    set_player_utr(request.json["utr"])
+    return jsonify(get_state())
 
 @app.route("/practice", methods=["POST"])
 def practice():
-    data = request.json
-    add_practice(int(data["minutes"]), int(data["intensity"]))
-    return jsonify(score=get_score())
+    log_practice(request.json["minutes"], request.json["intensity"])
+    return jsonify(get_state())
 
 @app.route("/match", methods=["POST"])
 def match():
-    data = request.json
-    add_match(int(data["opponent"]), data["result"])
-    return jsonify(score=get_score())
-
-if __name__ == "__main__":
-    app.run()
+    log_match(request.json["opponent"], request.json["result"])
+    return jsonify(get_state())
