@@ -1,56 +1,105 @@
-async function postData(url = '', data = {}) {
-    const res = await fetch(url, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(data)
-    });
-    return res.json();
-}
+let effectiveness = {{ effectiveness }};
+let labelText = "{{ label }}";
+let playerUTR = {{ utr ?? 0 }};
+let predictedUTR = {{ predicted ?? 0 }};
+let practiceHistory = [];
+let matchHistory = [];
 
-function updateUI(state){
-    document.getElementById('score').innerText = state.effectiveness;
-    document.querySelector('.score-box .label').innerText = state.label;
-    renderCharts(state);
-}
+const effectivenessEl = document.getElementById("effectiveness");
+const effectLabelEl = document.getElementById("effect-label");
+const practiceList = document.getElementById("practiceHistory");
+const matchList = document.getElementById("matchHistory");
 
-document.getElementById('practiceBtn').onclick = async () => {
-    const minutes = parseFloat(document.getElementById('minutes').value);
-    const intensity = parseFloat(document.getElementById('intensity').value);
-    const state = await postData('/practice', {minutes, intensity});
-    updateUI(state);
-};
+function updateDisplay() {
+    effectivenessEl.textContent = Math.round(effectiveness);
+    effectLabelEl.textContent = labelText;
 
-document.getElementById('matchBtn').onclick = async () => {
-    const opponent = parseFloat(document.getElementById('opponent').value);
-    const result = document.getElementById('result').value;
-    const state = await postData('/match', {opponent, result});
-    updateUI(state);
-};
-
-document.getElementById('resetBtn').onclick = async () => {
-    const state = await postData('/reset', {});
-    updateUI(state);
-};
-
-function renderCharts(state){
-    const effCtx = document.getElementById('effChart').getContext('2d');
-    const wlCtx = document.getElementById('wlChart').getContext('2d');
-
-    const labels = Object.keys(state.daily_effectiveness).sort();
-    const effData = labels.map(d => state.daily_effectiveness[d]);
-
-    new Chart(effCtx, {
-        type: 'line',
-        data: { labels, datasets: [{label: 'Effectiveness', data: effData, borderColor:'#38bdf8', fill:false}] },
-        options: { responsive:true }
+    practiceList.innerHTML = "";
+    practiceHistory.forEach(p => {
+        const li = document.createElement("li");
+        li.textContent = `${p.date}: ${p.minutes} min @ ${p.intensity}/5`;
+        practiceList.appendChild(li);
     });
 
-    const winCount = state.match_log.filter(m => m[2]=='win').length;
-    const lossCount = state.match_log.filter(m => m[2]=='loss').length;
-
-    new Chart(wlCtx, {
-        type:'bar',
-        data: { labels:['Wins','Losses'], datasets:[{label:'Matches', data:[winCount, lossCount], backgroundColor:['#22c55e','#ef4444']}] },
-        options:{responsive:true}
+    matchList.innerHTML = "";
+    matchHistory.forEach(m => {
+        const li = document.createElement("li");
+        li.textContent = `${m.date}: vs UTR ${m.opponent} - ${m.result}`;
+        matchList.appendChild(li);
     });
+
+    effectChart.data.labels.push(new Date().toLocaleDateString());
+    effectChart.data.datasets[0].data.push(effectiveness);
+    effectChart.update();
+
+    winChart.data.labels.push(new Date().toLocaleDateString());
+    let wins = matchHistory.filter(m => m.result === "win").length;
+    winChart.data.datasets[0].data.push(wins);
+    winChart.update();
 }
+
+document.getElementById("practiceBtn").addEventListener("click", () => {
+    const minutes = Number(document.getElementById("minutes").value);
+    const intensity = Number(document.getElementById("intensity").value);
+    if (!minutes || !intensity) return alert("Fill all fields");
+    const date = new Date().toLocaleDateString();
+    practiceHistory.push({minutes, intensity, date});
+    effectiveness += Math.min((minutes * intensity) / 40, 12);
+    effectiveness = Math.min(effectiveness, 100);
+    labelText = getLabel(effectiveness);
+    updateDisplay();
+});
+
+document.getElementById("matchBtn").addEventListener("click", () => {
+    const opponent = Number(document.getElementById("opponentUTR").value);
+    const result = document.getElementById("result").value;
+    if (!opponent) return alert("Enter opponent UTR");
+    const date = new Date().toLocaleDateString();
+    matchHistory.push({opponent, result, date});
+    effectiveness += (result === "win" ? 6 : -6);
+    effectiveness = Math.min(Math.max(effectiveness, 0), 100);
+    labelText = getLabel(effectiveness);
+    updateDisplay();
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+    effectiveness = 50;
+    labelText = getLabel(effectiveness);
+    practiceHistory = [];
+    matchHistory = [];
+    updateDisplay();
+});
+
+document.getElementById("setUTRBtn").addEventListener("click", () => {
+    const utr = Number(document.getElementById("playerUTR").value);
+    if (!utr || utr < 0 || utr > 16.5) return alert("UTR must be 0–16.5");
+    playerUTR = utr;
+    predictedUTR = utr;
+    alert(`UTR set to ${utr}`);
+});
+
+/* EFFECTIVENESS LABELS */
+function getLabel(e) {
+    if (e < 30) return "Cold";
+    if (e < 50) return "Average";
+    if (e < 70) return "Sharp";
+    if (e < 85) return "On Fire";
+    return "Peak Form";
+}
+
+/* CHARTS */
+const effectChartCtx = document.getElementById("effectivenessChart").getContext("2d");
+const effectChart = new Chart(effectChartCtx, {
+    type: "line",
+    data: { labels: [], datasets: [{ label: "Effectiveness", data: [], borderColor: "#38bdf8", backgroundColor: "rgba(56, 189, 248,0.2)", tension: 0.3 }] },
+    options: { responsive: true, scales: { y: { min: 0, max: 100 } } }
+});
+
+const winChartCtx = document.getElementById("winsChart").getContext("2d");
+const winChart = new Chart(winChartCtx, {
+    type: "bar",
+    data: { labels: [], datasets: [{ label: "Cumulative Wins", data: [], backgroundColor: "#facc15" }] },
+    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+});
+
+updateDisplay();
