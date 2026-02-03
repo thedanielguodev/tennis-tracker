@@ -17,7 +17,7 @@ def label(e):
 
 def set_player_utr(u):
     global player_utr, effectiveness
-    player_utr = clamp(float(u), 0, 16.5)
+    player_utr = clamp(float(u), 1, 16.5)  # minimum UTR is now 1
     effectiveness = 50
 
 def log_practice(minutes, intensity):
@@ -34,8 +34,8 @@ def log_practice(minutes, intensity):
 
 def log_match(opponent_utr, result):
     global player_utr, effectiveness
-    opponent_utr = float(opponent_utr)
     if player_utr is None: return
+    opponent_utr = float(opponent_utr)
     if abs(opponent_utr - player_utr) > 2: return
 
     win = result == "win"
@@ -46,7 +46,7 @@ def log_match(opponent_utr, result):
     K = 0.08
 
     delta = K * (actual - expected + form_factor)
-    player_utr = clamp(player_utr + delta, 0, 16.5)
+    player_utr = clamp(player_utr + delta, 1, 16.5)  # min 1
     effectiveness = clamp(effectiveness + (6 if win else -6), 0, 100)
 
     match_log.append({
@@ -57,7 +57,7 @@ def log_match(opponent_utr, result):
 
 def predict_utr():
     if player_utr is None: return None
-    return round(clamp(player_utr + (effectiveness - 50) / 300, 0, 16.5), 2)
+    return round(clamp(player_utr + (effectiveness - 50) / 300, 1, 16.5), 2)
 
 def reset_state():
     global player_utr, effectiveness, practice_log, match_log
