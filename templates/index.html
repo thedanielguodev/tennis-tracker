@@ -9,46 +9,57 @@
 <body>
 
 <div class="hero">
-    <h1>Train Smarter.<br>Win More Matches.</h1>
-    <p>Track practice quality, match difficulty, effectiveness, and see your predicted UTR.</p>
+    <h1>Train smarter.<br>Win more matches.</h1>
+    <p>Track practice quality, match difficulty, and see your effectiveness today.</p>
 
     <div class="score-box">
         <span class="label">Current Effectiveness</span>
-        <span class="score" id="effectiveness">{{ effectiveness }}</span>
-        <span class="label" id="effect-label">{{ label }}</span>
-    </div>
-
-    <button id="resetBtn">Reset All</button>
-
-    <div class="utr-input">
-        <input type="number" id="playerUTR" placeholder="Enter your current UTR (0-16.5)" step="0.1" min="0" max="16.5">
-        <button id="setUTRBtn">Set UTR</button>
-    </div>
-
-    <div class="info">
-        Effectiveness measures how sharp you feel today. Cold = low, Peak Form = highest. 
-        UTR predicts your skill level based on recent practice and matches.
+        <span class="score" id="score">{{ effectiveness }}</span>
+        <span class="label">Feeling:</span>
+        <span class="score" id="label">{{ label }}</span>
+        <span class="label">Predicted UTR:</span>
+        <span class="score" id="predicted">{{ predicted }}</span>
     </div>
 </div>
 
 <div class="actions">
     <div class="card">
-        <h2>Log Practice</h2>
-        <input id="minutes" type="number" placeholder="Minutes practiced">
-        <input id="intensity" type="number" min="1" max="5" placeholder="Intensity (1-5)">
-        <button id="practiceBtn">Log Practice</button>
-        <ul id="practiceHistory"></ul>
+        <h2>Set Your UTR</h2>
+        <input id="utr" type="number" min="0" max="16.5" placeholder="Enter your UTR">
+        <button id="utrBtn">Set UTR</button>
     </div>
 
     <div class="card">
-        <h2>Log Match</h2>
-        <input id="opponentUTR" type="number" min="0" max="16.5" placeholder="Opponent UTR">
+        <h2>Practice</h2>
+        <input id="minutes" type="number" placeholder="Minutes practiced">
+        <input id="intensity" type="number" min="1" max="5" placeholder="Intensity (1–5)">
+        <button id="practiceBtn">Log Practice</button>
+    </div>
+
+    <div class="card">
+        <h2>Match</h2>
+        <input id="opponent" type="number" min="0" max="16.5" placeholder="Opponent UTR">
         <select id="result">
             <option value="win">Win</option>
             <option value="loss">Loss</option>
         </select>
         <button id="matchBtn">Log Match</button>
-        <ul id="matchHistory"></ul>
+    </div>
+
+    <div class="card">
+        <h2>Reset</h2>
+        <button id="resetBtn">Reset Everything</button>
+    </div>
+</div>
+
+<div class="logs">
+    <div class="log-card">
+        <h3>Practice History</h3>
+        <ul id="practiceLog"></ul>
+    </div>
+    <div class="log-card">
+        <h3>Match History</h3>
+        <ul id="matchLog"></ul>
     </div>
 </div>
 
