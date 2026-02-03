@@ -1,29 +1,62 @@
-<h1>Train smarter.<br>Win more matches.</h1>
-<p>Track practice quality, match difficulty, and see a real effectiveness score.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tennis Skill Tracker</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
 
-<div class="score-box">
-    <span class="label">Current Effectiveness</span>
-    <span class="score" id="score">{{ effectiveness }}</span>
-    <span class="label">{{ label }}</span>
+<div class="hero">
+    <h1>Train Smarter.<br>Win More Matches.</h1>
+    <p>Track practice quality, match difficulty, effectiveness, and see your predicted UTR.</p>
+
+    <div class="score-box">
+        <span class="label">Current Effectiveness</span>
+        <span class="score" id="effectiveness">{{ effectiveness }}</span>
+        <span class="label" id="effect-label">{{ label }}</span>
+    </div>
+
+    <button id="resetBtn">Reset All</button>
+
+    <div class="utr-input">
+        <input type="number" id="playerUTR" placeholder="Enter your current UTR (0-16.5)" step="0.1" min="0" max="16.5">
+        <button id="setUTRBtn">Set UTR</button>
+    </div>
+
+    <div class="info">
+        Effectiveness measures how sharp you feel today. Cold = low, Peak Form = highest. 
+        UTR predicts your skill level based on recent practice and matches.
+    </div>
 </div>
-<button id="resetBtn">Reset All</button>
 
-<h3>Practice</h3>
-<input id="minutes" type="number" placeholder="Minutes practiced">
-<input id="intensity" type="number" min="1" max="5" placeholder="Intensity (1–5)">
-<button id="practiceBtn">Log Practice</button>
+<div class="actions">
+    <div class="card">
+        <h2>Log Practice</h2>
+        <input id="minutes" type="number" placeholder="Minutes practiced">
+        <input id="intensity" type="number" min="1" max="5" placeholder="Intensity (1-5)">
+        <button id="practiceBtn">Log Practice</button>
+        <ul id="practiceHistory"></ul>
+    </div>
 
-<h3>Match</h3>
-<input id="opponent" type="number" min="1" max="16.5" placeholder="Opponent UTR">
-<select id="result">
-    <option value="win">Win</option>
-    <option value="loss">Loss</option>
-</select>
-<button id="matchBtn">Log Match</button>
+    <div class="card">
+        <h2>Log Match</h2>
+        <input id="opponentUTR" type="number" min="0" max="16.5" placeholder="Opponent UTR">
+        <select id="result">
+            <option value="win">Win</option>
+            <option value="loss">Loss</option>
+        </select>
+        <button id="matchBtn">Log Match</button>
+        <ul id="matchHistory"></ul>
+    </div>
+</div>
 
-<h3>Effectiveness over time</h3>
-<canvas id="effChart" width="600" height="300"></canvas>
-<h3>Wins / Losses</h3>
-<canvas id="wlChart" width="600" height="300"></canvas>
+<div class="charts">
+    <canvas id="effectivenessChart"></canvas>
+    <canvas id="winsChart"></canvas>
+</div>
 
 <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
