@@ -1,6 +1,6 @@
 from datetime import datetime
 
-player_utr = 0.0
+player_utr = None
 effectiveness = 50
 practice_log = []
 match_log = []
@@ -15,48 +15,60 @@ def label(e):
     if e < 85: return "On Fire"
     return "Peak Form"
 
-def set_player_utr(utr):
-    global player_utr
-    player_utr = clamp(float(utr), 0, 16.5)
+def set_player_utr(u):
+    global player_utr, effectiveness
+    player_utr = clamp(float(u), 0, 16.5)
+    effectiveness = 50
 
 def log_practice(minutes, intensity):
     global effectiveness
-    date = datetime.now().strftime("%Y-%m-%d")
-    practice_log.append({"minutes": minutes, "intensity": intensity, "date": date})
+    minutes = float(minutes)
+    intensity = float(intensity)
+    practice_log.append({
+        "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "minutes": minutes,
+        "intensity": intensity
+    })
     boost = min((minutes * intensity) / 40, 12)
     effectiveness = clamp(effectiveness + boost, 0, 100)
 
 def log_match(opponent_utr, result):
     global player_utr, effectiveness
     opponent_utr = float(opponent_utr)
-    date = datetime.now().strftime("%Y-%m-%d")
-    
-    # Only count matches within 2 UTR difference
-    if abs(opponent_utr - player_utr) <= 2:
-        win = result.lower() == "win"
-        actual = 1 if win else 0
-        expected = 1 / (1 + 10 ** (opponent_utr - player_utr))
-        form_factor = (effectiveness - 50) / 200
-        K = 0.08
-        delta = K * (actual - expected + form_factor)
-        player_utr = clamp(player_utr + delta, 0, 16.5)
+    if player_utr is None: return
+    if abs(opponent_utr - player_utr) > 2: return
 
-    effectiveness = clamp(effectiveness + (6 if result.lower() == "win" else -6), 0, 100)
-    match_log.append({"opponent": opponent_utr, "result": result, "date": date})
+    win = result == "win"
+    actual = 1 if win else 0
+    expected = 1 / (1 + 10 ** (opponent_utr - player_utr))
 
-def reset_all():
+    form_factor = (effectiveness - 50) / 200
+    K = 0.08
+
+    delta = K * (actual - expected + form_factor)
+    player_utr = clamp(player_utr + delta, 0, 16.5)
+    effectiveness = clamp(effectiveness + (6 if win else -6), 0, 100)
+
+    match_log.append({
+        "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "opponent": opponent_utr,
+        "result": result
+    })
+
+def predict_utr():
+    if player_utr is None: return None
+    return round(clamp(player_utr + (effectiveness - 50) / 300, 0, 16.5), 2)
+
+def reset_state():
     global player_utr, effectiveness, practice_log, match_log
-    player_utr = 0
+    player_utr = None
     effectiveness = 50
     practice_log = []
     match_log = []
 
-def predict_utr():
-    return round(clamp(player_utr + (effectiveness - 50) / 300, 0, 16.5), 2)
-
 def get_state():
     return {
-        "utr": round(player_utr, 2),
+        "utr": round(player_utr, 2) if player_utr is not None else None,
         "effectiveness": round(effectiveness),
         "label": label(effectiveness),
         "predicted": predict_utr(),
