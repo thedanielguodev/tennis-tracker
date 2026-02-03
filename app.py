@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from calculations import set_player_utr, log_practice, log_match, reset_all, get_state
+from calculations import set_player_utr, log_practice, log_match, reset_state, get_state
 
 app = Flask(__name__)
 
@@ -9,29 +9,26 @@ def index():
 
 @app.route("/set_utr", methods=["POST"])
 def set_utr():
-    data = request.json
-    set_player_utr(data.get("utr", 0))
+    set_player_utr(request.json["utr"])
     return jsonify(get_state())
 
 @app.route("/practice", methods=["POST"])
 def practice():
-    data = request.json
-    minutes = data.get("minutes", 0)
-    intensity = data.get("intensity", 1)
-    log_practice(minutes, intensity)
+    log_practice(request.json["minutes"], request.json["intensity"])
     return jsonify(get_state())
 
 @app.route("/match", methods=["POST"])
 def match():
-    data = request.json
-    opponent = data.get("opponent", 0)
-    result = data.get("result", "loss")
-    log_match(opponent, result)
+    log_match(request.json["opponent"], request.json["result"])
     return jsonify(get_state())
 
 @app.route("/reset", methods=["POST"])
 def reset():
-    reset_all()
+    reset_state()
+    return jsonify(get_state())
+
+@app.route("/state")
+def state():
     return jsonify(get_state())
 
 if __name__ == "__main__":
