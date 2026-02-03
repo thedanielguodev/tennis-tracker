@@ -1,105 +1,87 @@
-let effectiveness = {{ effectiveness }};
-let labelText = "{{ label }}";
-let playerUTR = {{ utr ?? 0 }};
-let predictedUTR = {{ predicted ?? 0 }};
-let practiceHistory = [];
-let matchHistory = [];
+document.addEventListener("DOMContentLoaded", () => {
+    const utrInput = document.getElementById("utr");
+    const utrBtn = document.getElementById("utrBtn");
+    const minutesInput = document.getElementById("minutes");
+    const intensityInput = document.getElementById("intensity");
+    const practiceBtn = document.getElementById("practiceBtn");
+    const opponentInput = document.getElementById("opponent");
+    const resultSelect = document.getElementById("result");
+    const matchBtn = document.getElementById("matchBtn");
+    const resetBtn = document.getElementById("resetBtn");
 
-const effectivenessEl = document.getElementById("effectiveness");
-const effectLabelEl = document.getElementById("effect-label");
-const practiceList = document.getElementById("practiceHistory");
-const matchList = document.getElementById("matchHistory");
+    const scoreEl = document.getElementById("score");
+    const labelEl = document.getElementById("label");
+    const predictedEl = document.getElementById("predicted");
+    const practiceLogEl = document.getElementById("practiceLog");
+    const matchLogEl = document.getElementById("matchLog");
 
-function updateDisplay() {
-    effectivenessEl.textContent = Math.round(effectiveness);
-    effectLabelEl.textContent = labelText;
+    let effectivenessChart, winsChart;
 
-    practiceList.innerHTML = "";
-    practiceHistory.forEach(p => {
-        const li = document.createElement("li");
-        li.textContent = `${p.date}: ${p.minutes} min @ ${p.intensity}/5`;
-        practiceList.appendChild(li);
+    async function updateState() {
+        const res = await fetch("/state");
+        const data = await res.json();
+
+        scoreEl.textContent = data.effectiveness;
+        labelEl.textContent = data.label;
+        predictedEl.textContent = data.predicted ? `Predicted UTR: ${data.predicted}` : "-";
+
+        // Practice log
+        practiceLogEl.innerHTML = "";
+        data.practice_log.forEach(p => {
+            const li = document.createElement("li");
+            li.textContent = `${p.date} - ${p.minutes} min, Intensity ${p.intensity}`;
+            practiceLogEl.appendChild(li);
+        });
+
+        // Match log
+        matchLogEl.innerHTML = "";
+        data.match_log.forEach(m => {
+            const li = document.createElement("li");
+            li.textContent = `${m.date} - Opponent ${m.opponent}, Result: ${m.result}`;
+            matchLogEl.appendChild(li);
+        });
+
+        // Charts
+        const effData = data.practice_log.map(p => p.intensity * p.minutes);
+        const effLabels = data.practice_log.map(p => p.date);
+
+        if (effectivenessChart) effectivenessChart.destroy();
+        effectivenessChart = new Chart(document.getElementById("effectivenessChart"), {
+            type: 'line',
+            data: { labels: effLabels, datasets: [{ label: 'Practice Impact', data: effData, borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248,0.2)', fill:true }]},
+            options: { responsive: true, plugins: { legend: { display: false }}}
+        });
+
+        const winsData = data.match_log.map(m => m.result === "win" ? 1 : 0);
+        const winsLabels = data.match_log.map(m => m.date);
+
+        if (winsChart) winsChart.destroy();
+        winsChart = new Chart(document.getElementById("winsChart"), {
+            type: 'bar',
+            data: { labels: winsLabels, datasets: [{ label: 'Wins', data: winsData, backgroundColor: '#0ea5e9' }]},
+            options: { responsive: true, scales: { y: { beginAtZero: true, max: 1, ticks: { stepSize: 1 }}}}
+        });
+    }
+
+    utrBtn.addEventListener("click", async () => {
+        await fetch("/set_utr", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ utr: utrInput.value })});
+        updateState();
     });
 
-    matchList.innerHTML = "";
-    matchHistory.forEach(m => {
-        const li = document.createElement("li");
-        li.textContent = `${m.date}: vs UTR ${m.opponent} - ${m.result}`;
-        matchList.appendChild(li);
+    practiceBtn.addEventListener("click", async () => {
+        await fetch("/practice", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ minutes: minutesInput.value, intensity: intensityInput.value })});
+        updateState();
     });
 
-    effectChart.data.labels.push(new Date().toLocaleDateString());
-    effectChart.data.datasets[0].data.push(effectiveness);
-    effectChart.update();
+    matchBtn.addEventListener("click", async () => {
+        await fetch("/match", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ opponent: opponentInput.value, result: resultSelect.value })});
+        updateState();
+    });
 
-    winChart.data.labels.push(new Date().toLocaleDateString());
-    let wins = matchHistory.filter(m => m.result === "win").length;
-    winChart.data.datasets[0].data.push(wins);
-    winChart.update();
-}
+    resetBtn.addEventListener("click", async () => {
+        await fetch("/reset", { method: "POST" });
+        updateState();
+    });
 
-document.getElementById("practiceBtn").addEventListener("click", () => {
-    const minutes = Number(document.getElementById("minutes").value);
-    const intensity = Number(document.getElementById("intensity").value);
-    if (!minutes || !intensity) return alert("Fill all fields");
-    const date = new Date().toLocaleDateString();
-    practiceHistory.push({minutes, intensity, date});
-    effectiveness += Math.min((minutes * intensity) / 40, 12);
-    effectiveness = Math.min(effectiveness, 100);
-    labelText = getLabel(effectiveness);
-    updateDisplay();
+    updateState();
 });
-
-document.getElementById("matchBtn").addEventListener("click", () => {
-    const opponent = Number(document.getElementById("opponentUTR").value);
-    const result = document.getElementById("result").value;
-    if (!opponent) return alert("Enter opponent UTR");
-    const date = new Date().toLocaleDateString();
-    matchHistory.push({opponent, result, date});
-    effectiveness += (result === "win" ? 6 : -6);
-    effectiveness = Math.min(Math.max(effectiveness, 0), 100);
-    labelText = getLabel(effectiveness);
-    updateDisplay();
-});
-
-document.getElementById("resetBtn").addEventListener("click", () => {
-    effectiveness = 50;
-    labelText = getLabel(effectiveness);
-    practiceHistory = [];
-    matchHistory = [];
-    updateDisplay();
-});
-
-document.getElementById("setUTRBtn").addEventListener("click", () => {
-    const utr = Number(document.getElementById("playerUTR").value);
-    if (!utr || utr < 0 || utr > 16.5) return alert("UTR must be 0–16.5");
-    playerUTR = utr;
-    predictedUTR = utr;
-    alert(`UTR set to ${utr}`);
-});
-
-/* EFFECTIVENESS LABELS */
-function getLabel(e) {
-    if (e < 30) return "Cold";
-    if (e < 50) return "Average";
-    if (e < 70) return "Sharp";
-    if (e < 85) return "On Fire";
-    return "Peak Form";
-}
-
-/* CHARTS */
-const effectChartCtx = document.getElementById("effectivenessChart").getContext("2d");
-const effectChart = new Chart(effectChartCtx, {
-    type: "line",
-    data: { labels: [], datasets: [{ label: "Effectiveness", data: [], borderColor: "#38bdf8", backgroundColor: "rgba(56, 189, 248,0.2)", tension: 0.3 }] },
-    options: { responsive: true, scales: { y: { min: 0, max: 100 } } }
-});
-
-const winChartCtx = document.getElementById("winsChart").getContext("2d");
-const winChart = new Chart(winChartCtx, {
-    type: "bar",
-    data: { labels: [], datasets: [{ label: "Cumulative Wins", data: [], backgroundColor: "#facc15" }] },
-    options: { responsive: true, scales: { y: { beginAtZero: true } } }
-});
-
-updateDisplay();
