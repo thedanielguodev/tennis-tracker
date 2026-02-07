@@ -54,15 +54,27 @@ def dashboard():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     user = User.query.get(session['user_id'])
-    players = Player.query.filter_by(user_id=user.id).all() if user.role=='coach' else Player.query.filter_by(user_id=user.id).all()
+    # Coaches see all players they manage
+    if user.role == 'coach':
+        players = Player.query.filter_by(coach_id=user.id).all()
+    else:
+        players = Player.query.filter_by(user_id=user.id).all()
     return render_template('dashboard.html', user=user, players=players)
 
-# ----------------- PLAYER ACTIONS -----------------
+# ----------------- PLAYER VIEW -----------------
 @app.route('/player/<int:player_id>')
 def player_view(player_id):
     player = Player.query.get_or_404(player_id)
-    return render_template('player.html', player=player, label=label_effectiveness(player.effectiveness), predicted=predict_utr(player))
+    return render_template(
+        'player.html',
+        player=player,
+        label=label_effectiveness(player.effectiveness),
+        predicted=predict_utr(player),
+        practice_logs=PracticeLog.query.filter_by(player_id=player.id).order_by(PracticeLog.date).all(),
+        match_logs=MatchLog.query.filter_by(player_id=player.id).order_by(MatchLog.date).all()
+    )
 
+# ----------------- PLAYER ACTIONS -----------------
 @app.route('/practice', methods=['POST'])
 def practice():
     data = request.json
@@ -97,6 +109,23 @@ def reset():
     return jsonify({
         'effectiveness': round(player.effectiveness),
         'label': label_effectiveness(player.effectiveness)
+    })
+
+# ----------------- CREATE PLAYER -----------------
+@app.route('/create_player', methods=['POST'])
+def create_player():
+    if 'user_id' not in session:
+        return jsonify({'error':'Not logged in'}), 401
+    user = User.query.get(session['user_id'])
+    name = request.json.get('name')
+    player = Player(name=name, user_id=user.id, current_utr=1, effectiveness=50)
+    db.session.add(player)
+    db.session.commit()
+    return jsonify({
+        'player_id': player.id,
+        'name': player.name,
+        'utr': player.current_utr,
+        'effectiveness': player.effectiveness
     })
 
 if __name__ == '__main__':
