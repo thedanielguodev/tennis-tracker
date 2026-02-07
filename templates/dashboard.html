@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<h1>Welcome, {{ user.username }}</h1>
+
+{% for player in players %}
+<div class="player-card">
+    <h2>{{ player.name }}</h2>
+    <p>Current UTR: {{ player.current_utr }}</p>
+    <p>Effectiveness: {{ player.effectiveness }}% ({{ label_effectiveness(player.effectiveness) }})</p>
+    <p>Predicted UTR: {{ predict_utr(player) }}</p>
+
+    <button onclick="resetEffectiveness({{ player.id }})">Reset Effectiveness</button>
+
+    <h3>Log Practice</h3>
+    <input type="number" id="minutes-{{player.id}}" placeholder="Minutes">
+    <input type="number" id="intensity-{{player.id}}" placeholder="Intensity 1-5">
+    <button onclick="logPractice({{ player.id }})">Log</button>
+
+    <h3>Log Match</h3>
+    <input type="number" id="opp-{{player.id}}" placeholder="Opponent UTR">
+    <select id="result-{{player.id}}">
+        <option value="win">Win</option>
+        <option value="loss">Loss</option>
+    </select>
+    <button onclick="logMatch({{ player.id }})">Log</button>
+</div>
+<hr>
+{% endfor %}
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
