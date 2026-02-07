@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Player, PracticeLog, MatchLog
 from calculations import log_practice, log_match, predict_utr, reset_effectiveness, label_effectiveness
 from datetime import datetime
-
+#updated
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tennis.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
